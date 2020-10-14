@@ -1,16 +1,23 @@
-# Disable AnyConnect to break Umbrella
-echo "Disabling AnyConnect fully, VPN will disconnect"
-sudo launchctl unload /Library/LaunchDaemons/com.cisco.anyconnect.vpnagentd.plist
+#/bin/bash
 
-seconds_remain="5"
+# Fail if bash errors out
+set -e
 
-while [ $seconds_remain -gt 0 ]
-do
-echo "Sleeping for" $seconds_remain
-sleep 1
-seconds_remain=$[$seconds_remain-1]
-done
+# Get desired umbrella state
+echo "Umbrella is the worst. This tool disables Umbrella by unloading AnyConnect"
+printf 'Disable AnyConnect Umbrella? (disable/enable): '
+read -r UMBRELLA_STATE
 
-# Re-register service now with Umbrella config removed
-echo "Re-enabling AnyConnect, Umbrella will be broken until next connect"
-sudo launchctl load /Library/LaunchDaemons/com.cisco.anyconnect.vpnagentd.plist
+# Take appropriate and decisive action
+case $UMBRELLA_STATE in
+
+  [d,D]isable)
+    echo "Disabling AnyConnect - remember to enable later to fix AnyConnect"
+    sudo launchctl unload /Library/LaunchDaemons/com.cisco.anyconnect.vpnagentd.plist
+    ;;
+
+  [e,E]nable)
+    echo "Disabling AnyConnect - remember to enable later to fix AnyConnect"
+    sudo launchctl load /Library/LaunchDaemons/com.cisco.anyconnect.vpnagentd.plist
+    ;;
+esac
